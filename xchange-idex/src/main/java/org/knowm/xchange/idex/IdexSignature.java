@@ -8,9 +8,9 @@ import static org.web3j.crypto.Hash.sha3;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.HexFormat;
 import java.util.LinkedList;
 import java.util.List;
-import org.bouncycastle.util.encoders.Hex;
 import org.web3j.crypto.ECKeyPair;
 import org.web3j.crypto.Sign;
 import org.web3j.crypto.Sign.SignatureData;
@@ -71,7 +71,7 @@ public class IdexSignature {
     // salt the hashed packed string
     saltBytes = "\u0019Ethereum Signed Message:\n32".getBytes();
 
-    assert (new String(Hex.toHexString(saltBytes)).toLowerCase()
+    assert (new String(HexFormat.of().formatHex(saltBytes)).toLowerCase()
         == "19457468657265756d205369676e6564204d6573736167653a0a3332");
 
     byte[] salted = null;

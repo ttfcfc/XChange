@@ -22,17 +22,13 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.Security;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.regex.Pattern;
 import lombok.Getter;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.crypto.Signer;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.crypto.signers.Ed25519Signer;
-import org.bouncycastle.crypto.util.PrivateKeyFactory;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.Signature;
 import org.knowm.xchange.binance.BinanceAdapters;
 import org.knowm.xchange.binance.dto.BinanceException;
 import org.knowm.xchange.binance.dto.trade.BinanceCancelOrderParams;
@@ -118,19 +114,20 @@ public class BinanceUserTradeStreamingService extends JsonNettyStreamingService 
                 });
   }
 
-  public String signPayload(String payload) throws Exception {
-    Security.addProvider(new BouncyCastleProvider());
-    byte[] decodePrivateKey = Base64.getDecoder().decode(privateKey.getBytes(charSet));
-    PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(decodePrivateKey);
-    PrivateKeyInfo instancePrivate = PrivateKeyInfo.getInstance(pkcs8EncodedKeySpec.getEncoded());
-    AsymmetricKeyParameter keyPrivate = PrivateKeyFactory.createKey(instancePrivate);
-    Signer signer = new Ed25519Signer();
-    signer.init(true, keyPrivate);
-    var payloadBytes = payload.getBytes(charSet);
-    signer.update(payloadBytes, 0, payloadBytes.length);
-    byte[] signature = signer.generateSignature();
-    return new String(Base64.getEncoder().encode(signature));
-  }
+    public String signPayload(String payload) throws Exception {
+        // privateKey 必须是 PKCS#8 编码的私钥，且已用 Base64 编码为字符串
+        byte[] pkcs8Bytes = Base64.getDecoder().decode(privateKey);
+        PKCS8EncodedKeySpec pkcs8Spec = new PKCS8EncodedKeySpec(pkcs8Bytes);
+        KeyFactory kf = KeyFactory.getInstance("Ed25519");
+        PrivateKey priv = kf.generatePrivate(pkcs8Spec);
+
+        Signature signatureInstance = Signature.getInstance("Ed25519");
+        signatureInstance.initSign(priv);
+        byte[] payloadBytes = payload.getBytes(charSet);
+        signatureInstance.update(payloadBytes);
+        byte[] signatureBytes = signatureInstance.sign();
+        return Base64.getEncoder().encodeToString(signatureBytes);
+    }
 
   @Override
   public void messageHandler(String message) {

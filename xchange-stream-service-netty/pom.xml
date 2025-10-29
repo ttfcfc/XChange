@@ -20,10 +20,51 @@
         </dependency>
 
         <!-- Netty version compatible with service-wamp -->
+        <!--        <dependency>-->
+        <!--            <groupId>io.netty</groupId>-->
+        <!--            <artifactId>netty-all</artifactId>-->
+        <!--        </dependency>-->
+        <!-- Netty 核心组件 -->
         <dependency>
             <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
+            <artifactId>netty-buffer</artifactId>
+            <version>4.2.2.Final</version>
         </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec</artifactId>
+            <version>4.2.2.Final</version>
+        </dependency>
+        <!-- HTTP 支持（WebSocket 基于 HTTP 升级握手） -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-http</artifactId>
+            <version>4.2.2.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+            <version>4.2.2.Final</version>
+        </dependency>
+        <!-- WebSocket 实现 -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler</artifactId>
+            <version>4.2.2.Final</version>
+        </dependency>
+
+        <!-- 如果使用 wss:// 则需要 SSL 支持 -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler-proxy</artifactId>
+            <version>4.2.2.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport</artifactId>
+            <version>4.2.2.Final</version>
+        </dependency>
+
         <dependency>
             <groupId>org.knowm.xchange</groupId>
             <artifactId>xchange-stream-service-core</artifactId>
