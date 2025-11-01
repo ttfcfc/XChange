@@ -3,10 +3,13 @@ package org.knowm.xchange.binance.service;
 import static org.knowm.xchange.binance.BinanceResilience.REQUEST_WEIGHT_RATE_LIMITER;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.knowm.xchange.binance.BinanceAdapters;
 import org.knowm.xchange.binance.BinanceExchange;
+import org.knowm.xchange.binance.dto.BinanceException;
 import org.knowm.xchange.binance.dto.marketdata.BinanceAggTrades;
 import org.knowm.xchange.binance.dto.marketdata.BinanceFundingRate;
 import org.knowm.xchange.binance.dto.marketdata.BinanceKline;
@@ -21,6 +24,7 @@ import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.derivative.FuturesContract;
 import org.knowm.xchange.instrument.Instrument;
+import org.knowm.xchange.utils.ObjectMapperHelper;
 import org.knowm.xchange.utils.StreamUtils;
 
 public class BinanceMarketDataServiceRaw extends BinanceBaseService {
@@ -41,10 +45,20 @@ public class BinanceMarketDataServiceRaw extends BinanceBaseService {
   }
 
   public BinanceExchangeInfo getExchangeInfo() throws IOException {
-    return decorateApiCall(binance::exchangeInfo)
-        .withRetry(retry("exchangeInfo"))
-        .withRateLimiter(rateLimiter(REQUEST_WEIGHT_RATE_LIMITER))
-        .call();
+      try {
+          return decorateApiCall(binance::exchangeInfo)
+                  .withRetry(retry("exchangeInfo"))
+                  .withRateLimiter(rateLimiter(REQUEST_WEIGHT_RATE_LIMITER))
+                  .call();
+      } catch (Exception e) {
+          LOG.info("load exchange info failed:{}.", e.getMessage());
+          try (InputStream in = this.getClass().getResourceAsStream("/exchangeInfo.json")) {
+              if (in == null) throw new IllegalStateException("exchangeInfo.json not found");
+              String text = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+              LOG.info("use default exchange info.");
+              return ObjectMapperHelper.readValue(text, BinanceExchangeInfo.class);
+          }
+      }
   }
 
   public BinanceExchangeInfo getFutureExchangeInfo() throws IOException {

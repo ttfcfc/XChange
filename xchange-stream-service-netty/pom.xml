@@ -9,8 +9,10 @@
         <version>5.2.4-SNAPSHOT</version>
     </parent>
     <artifactId>xchange-stream-service-netty</artifactId>
-
     <name>XChange Core Stream Netty</name>
+    <properties>
+        <netty.version>4.2.2.Final</netty.version>
+    </properties>
 
     <dependencies>
 
@@ -28,41 +30,41 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-buffer</artifactId>
-            <version>4.2.2.Final</version>
+            <version>${netty.version}</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec</artifactId>
-            <version>4.2.2.Final</version>
+            <version>${netty.version}</version>
         </dependency>
         <!-- HTTP 支持（WebSocket 基于 HTTP 升级握手） -->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-http</artifactId>
-            <version>4.2.2.Final</version>
+            <version>${netty.version}</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-common</artifactId>
-            <version>4.2.2.Final</version>
+            <version>${netty.version}</version>
         </dependency>
         <!-- WebSocket 实现 -->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-handler</artifactId>
-            <version>4.2.2.Final</version>
+            <version>${netty.version}</version>
         </dependency>
 
         <!-- 如果使用 wss:// 则需要 SSL 支持 -->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-handler-proxy</artifactId>
-            <version>4.2.2.Final</version>
+            <version>${netty.version}</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-transport</artifactId>
-            <version>4.2.2.Final</version>
+            <version>${netty.version}</version>
         </dependency>
 
         <dependency>
