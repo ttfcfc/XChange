@@ -62,10 +62,20 @@ public class BinanceMarketDataServiceRaw extends BinanceBaseService {
   }
 
   public BinanceExchangeInfo getFutureExchangeInfo() throws IOException {
-    return decorateApiCall(binanceFutures::exchangeInfo)
-        .withRetry(retry("exchangeInfo"))
-        .withRateLimiter(rateLimiter(REQUEST_WEIGHT_RATE_LIMITER))
-        .call();
+    try {
+      return decorateApiCall(binanceFutures::exchangeInfo)
+          .withRetry(retry("exchangeInfo"))
+          .withRateLimiter(rateLimiter(REQUEST_WEIGHT_RATE_LIMITER))
+          .call();
+    } catch (Exception e) {
+      LOG.info("load future exchange info failed:{}.", e.getMessage());
+      try (InputStream in = this.getClass().getResourceAsStream("/futureExchangeInfo.json")) {
+        if (in == null) throw new IllegalStateException("futureExchangeInfo.json not found");
+        String text = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+        LOG.info("use default future exchange info.");
+        return ObjectMapperHelper.readValue(text, BinanceExchangeInfo.class);
+      }
+    }
   }
 
   public BinanceOrderbook getBinanceOrderbookAllProducts(Instrument pair, Integer limit)
