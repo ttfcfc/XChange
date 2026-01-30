@@ -163,6 +163,7 @@ public class BinanceFutureStreamPublicTest {
                   }
                   assertThat(trade.getInstrument().equals(instrument)).isTrue();
                 }));
+    // main net only
     disposables.add(
         exchange
             .getStreamingMarketDataService()

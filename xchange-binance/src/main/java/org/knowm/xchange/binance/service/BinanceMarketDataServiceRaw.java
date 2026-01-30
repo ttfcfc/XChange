@@ -12,6 +12,7 @@ import org.knowm.xchange.binance.BinanceExchange;
 import org.knowm.xchange.binance.dto.BinanceException;
 import org.knowm.xchange.binance.dto.marketdata.BinanceAggTrades;
 import org.knowm.xchange.binance.dto.marketdata.BinanceFundingRate;
+import org.knowm.xchange.binance.dto.marketdata.BinanceFundingRateInfo;
 import org.knowm.xchange.binance.dto.marketdata.BinanceKline;
 import org.knowm.xchange.binance.dto.marketdata.BinanceOrderbook;
 import org.knowm.xchange.binance.dto.marketdata.BinancePrice;
@@ -189,6 +190,12 @@ public class BinanceMarketDataServiceRaw extends BinanceBaseService {
     return decorateApiCall(() -> binanceFutures.fundingRate(BinanceAdapters.toSymbol(instrument)))
         .withRetry(retry("fundingRate"))
         .withRateLimiter(rateLimiter(REQUEST_WEIGHT_RATE_LIMITER))
+        .call();
+  }
+
+  public List<BinanceFundingRateInfo> getBinanceFundingRateInfo() throws IOException {
+    return decorateApiCall(() -> binanceFutures.fundingRateInfo())
+        .withRetry(retry("fundingRate"))
         .call();
   }
 

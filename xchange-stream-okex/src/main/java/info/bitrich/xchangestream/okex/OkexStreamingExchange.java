@@ -20,9 +20,6 @@ public class OkexStreamingExchange extends OkexExchange implements StreamingExch
   public static final String WS_PUBLIC_CHANNEL_URI = "wss://ws.okx.com:8443/ws/v5/public";
   public static final String WS_PRIVATE_CHANNEL_URI = "wss://ws.okx.com:8443/ws/v5/private";
 
-  public static final String AWS_WS_PUBLIC_CHANNEL_URI = "wss://wsaws.okx.com:8443/ws/v5/public";
-  public static final String AWS_WS_PRIVATE_CHANNEL_URI = "wss://wsaws.okx.com:8443/ws/v5/private";
-
   // Demo(Sandbox) URIs
   public static final String SANDBOX_WS_PUBLIC_CHANNEL_URI =
       "wss://wspap.okx.com:8443/ws/v5/public?brokerId=9999";
@@ -41,10 +38,12 @@ public class OkexStreamingExchange extends OkexExchange implements StreamingExch
 
   @Override
   public Completable connect(ProductSubscription... args) {
+    applyWebsocketTimeouts(this.exchangeSpecification);
     this.streamingService = new OkexStreamingService(getPublicApiUrl(), this.exchangeSpecification);
     if (isApiKeyValid()) {
       this.privateStreamingService =
           new OkexPrivateStreamingService(getPrivateApiUrl(), this.exchangeSpecification, this);
+      applyStreamingSpecification(exchangeSpecification, privateStreamingService);
     }
     this.streamingMarketDataService =
         new OkexStreamingMarketDataService(streamingService, exchangeMetaData);
@@ -72,24 +71,20 @@ public class OkexStreamingExchange extends OkexExchange implements StreamingExch
     if (exchangeSpec.getOverrideWebsocketApiUri() != null) {
       return exchangeSpec.getOverrideWebsocketApiUri();
     }
-    boolean userAws =
-        Boolean.TRUE.equals(exchangeSpecification.getExchangeSpecificParametersItem(PARAM_USE_AWS));
     if (useSandbox()) {
       apiUrl = SANDBOX_WS_PUBLIC_CHANNEL_URI;
     } else {
-      apiUrl = userAws ? AWS_WS_PUBLIC_CHANNEL_URI : WS_PUBLIC_CHANNEL_URI;
+      apiUrl = WS_PUBLIC_CHANNEL_URI;
     }
     return apiUrl;
   }
 
   private String getPrivateApiUrl() {
     String apiUrl;
-    boolean userAws =
-        Boolean.TRUE.equals(exchangeSpecification.getExchangeSpecificParametersItem(PARAM_USE_AWS));
     if (useSandbox()) {
       apiUrl = SANDBOX_WS_PRIVATE_CHANNEL_URI;
     } else {
-      apiUrl = userAws ? AWS_WS_PRIVATE_CHANNEL_URI : WS_PRIVATE_CHANNEL_URI;
+      apiUrl = WS_PRIVATE_CHANNEL_URI;
     }
     return apiUrl;
   }
